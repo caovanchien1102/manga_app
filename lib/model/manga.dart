@@ -1,3 +1,5 @@
+import 'package:manga_app/model/chapter.dart';
+
 class Manga {
   String? url;
   String? thumb;
@@ -6,9 +8,10 @@ class Manga {
 
   String? newChapter;
   String? timeUpdate;
+  String? referer;
 
   List<String>? categories;
-  List<String>? chapters;
+  List<Chapter>? chapters;
 
   Manga({
     this.url,
@@ -19,6 +22,7 @@ class Manga {
     this.timeUpdate,
     this.categories,
     this.chapters,
+    this.referer,
   });
 
   @override

@@ -6,4 +6,20 @@ extension ListExtension<T> on List<T> {
       return null;
     }
   }
+
+  T? firstOrNull() {
+    try {
+      return first;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  T? lastOrNull() {
+    try {
+      return last;
+    } catch (e) {
+      return null;
+    }
+  }
 }

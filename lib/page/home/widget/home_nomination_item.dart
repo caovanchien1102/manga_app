@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:manga_app/contant/size.dart';
 import 'package:manga_app/widget/divider/divider.dart';
 import 'package:manga_app/widget/text/text.dart';
 import 'package:manga_app/widget/image/image_loader.dart';
@@ -12,9 +13,6 @@ class HomeNominationItem extends StatelessWidget {
   final String? newChapter;
   final String? timeUpdate;
   final String? referer;
-
-  final double height = 220;
-  final double width = 160;
 
   final void Function(String url) onTap;
 
@@ -68,8 +66,8 @@ class HomeNominationItem extends StatelessWidget {
     required String title,
   }) {
     return Container(
-      width: width,
-      height: height,
+      width: thumbWidth,
+      height: thumbHeight,
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
@@ -96,7 +94,7 @@ class HomeNominationItem extends StatelessWidget {
           Positioned(
             bottom: 0,
             child: Container(
-              width: width,
+              width: thumbWidth,
               padding: const EdgeInsets.only(
                 left: 8,
                 right: 8,
@@ -121,7 +119,7 @@ class HomeNominationItem extends StatelessWidget {
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w500,
-                  fontSize: 10,
+                  fontSize: 12,
                 ),
               ),
             ),
@@ -157,7 +155,7 @@ class HomeNominationItem extends StatelessWidget {
           Text(
             content,
             style: const TextStyle(
-              fontSize: 8,
+              fontSize: 8.5,
               color: Colors.white,
               fontWeight: FontWeight.w500,
             ),
