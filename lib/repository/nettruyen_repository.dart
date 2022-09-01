@@ -2,6 +2,9 @@ import 'package:http/http.dart';
 import 'package:html/parser.dart';
 import 'package:manga_app/model/category.dart';
 import 'package:manga_app/model/manga.dart';
+import 'package:manga_app/page/home/bloc/home_state.dart';
+import 'package:manga_app/utils/list.dart';
+import 'package:manga_app/utils/trim_url.dart';
 
 abstract class NetTruyenRepoSource {
   Future<String?> fetchBody({required String path});
@@ -11,7 +14,7 @@ void main() {
   var nettruyenRepo = NetTruyenRepo();
 
   nettruyenRepo.fetchBody(path: "").then((value) async {
-    var mangas = await nettruyenRepo.fetchMangaNewUpdate(value);
+    var mangas = await nettruyenRepo.parseMangaNewUpdate(value);
     for (var manga in mangas) {
       print("Chien cao: $manga");
     }
@@ -40,7 +43,25 @@ class NetTruyenRepo extends NetTruyenRepoSource {
     return null;
   }
 
-  Future<List<Category>> fetchCategories(String? body) async {
+  /// === Fetch Page === ///
+
+  Stream<HomeState> fetchHomePage() async* {
+    var body = await fetchBody(path: "");
+
+    yield CategoryHomeState(
+      categories: await parseCategories(body),
+    );
+    yield NominationHomeState(
+      mangas: await parseMangaNominations(body),
+    );
+    yield NewMangaUpdateHomeState(
+      mangas: await parseMangaNewUpdate(body),
+    );
+  }
+
+  /// === Parser Data === ///
+
+  Future<List<Category>> parseCategories(String? body) async {
     var categories = <Category>[];
     var elements = parse(body).querySelectorAll(
       ".dropdown .megamenu .clearfix .nav a",
@@ -60,7 +81,7 @@ class NetTruyenRepo extends NetTruyenRepoSource {
     return categories;
   }
 
-  Future<List<Manga>> fetchMangaNominations(String? body) async {
+  Future<List<Manga>> parseMangaNominations(String? body) async {
     var mangas = <Manga>[];
     var elements = parse(body).querySelectorAll(
       ".container .ModuleContent .items-slide .item",
@@ -70,17 +91,26 @@ class NetTruyenRepo extends NetTruyenRepoSource {
       var url = element.querySelector("a")?.attributes["href"];
       var thumb = element.querySelector("a img")?.attributes["data-src"];
       var name = element.querySelector("a img")?.attributes["alt"];
-      mangas.add(Manga(
-        url: url,
-        thumb: thumb,
-        name: name,
-      ));
+      var newChapter =
+          element.querySelectorAll(".slide-caption a").getOrNull(1)?.text;
+      var timeUpdate =
+          element.querySelector(".slide-caption .time")?.text.trim();
+
+      mangas.add(
+        Manga(
+          url: trimUrl(url),
+          thumb: trimUrl(thumb),
+          name: name,
+          newChapter: newChapter,
+          timeUpdate: timeUpdate,
+        ),
+      );
     }
 
     return mangas;
   }
 
-  Future<List<Manga>> fetchMangaNewUpdate(String? body) async {
+  Future<List<Manga>> parseMangaNewUpdate(String? body) async {
     var mangas = <Manga>[];
     var elements = parse(body).querySelectorAll(
       ".row .Module-163 .ModuleContent .items .row .item",
@@ -89,7 +119,7 @@ class NetTruyenRepo extends NetTruyenRepoSource {
     for (var element in elements) {
       var url = element.querySelector("a")?.attributes["href"];
       var thumb = element.querySelector("a img")?.attributes["data-original"];
-      var name = element.querySelector("a img")?.attributes["alt"];
+      var name = element.querySelector("figcaption h3 a")?.text;
       var description = element.querySelector(".box_tootip .box_text")?.text;
       var elementCategory = element.querySelectorAll(
         ".box_tootip .message_main p",
@@ -103,13 +133,15 @@ class NetTruyenRepo extends NetTruyenRepoSource {
         }
       }
 
-      mangas.add(Manga(
-        url: url,
-        thumb: thumb,
-        name: name,
-        description: description,
-        categories: categories,
-      ));
+      mangas.add(
+        Manga(
+          url: trimUrl(url),
+          thumb: trimUrl(thumb),
+          name: name,
+          description: description,
+          categories: categories,
+        ),
+      );
     }
 
     return mangas;

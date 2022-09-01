@@ -4,6 +4,9 @@ class Manga {
   String? name;
   String? description;
 
+  String? newChapter;
+  String? timeUpdate;
+
   List<String>? categories;
   List<String>? chapters;
 
@@ -12,6 +15,8 @@ class Manga {
     this.thumb,
     this.name,
     this.description,
+    this.newChapter,
+    this.timeUpdate,
     this.categories,
     this.chapters,
   });
