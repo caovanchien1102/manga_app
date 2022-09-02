@@ -14,6 +14,8 @@ import 'package:manga_app/widget/icon/circle.dart';
 import 'package:manga_app/widget/title/title.dart';
 
 class HomePage extends StatefulWidget {
+  static const route = "home_page";
+
   const HomePage({Key? key}) : super(key: key);
 
   @override
@@ -144,7 +146,10 @@ class _HomePageState extends BaseState<HomeBloc, HomePage> {
               return HomeNewUpdateItem(
                 manga: manga,
                 onTap: (url) {
-                  print("url$url");
+                  Navigator.of(context).pushNamed(
+                    "detail_page",
+                    arguments: url,
+                  );
                 },
               );
             },

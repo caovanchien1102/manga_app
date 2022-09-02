@@ -3,7 +3,10 @@ import 'package:http/http.dart';
 import 'package:html/parser.dart';
 import 'package:manga_app/model/category.dart';
 import 'package:manga_app/model/chapter.dart';
+import 'package:manga_app/model/content.dart';
 import 'package:manga_app/model/manga.dart';
+import 'package:manga_app/page/content/bloc/content_state.dart';
+import 'package:manga_app/page/detail/bloc/detail_state.dart';
 import 'package:manga_app/page/home/bloc/home_state.dart';
 import 'package:manga_app/utils/list.dart';
 import 'package:manga_app/utils/map.dart';
@@ -42,6 +45,30 @@ class NetTruyenRepo extends NetTruyenRepoSource {
     yield NewMangaUpdateHomeState(
       mangas: await parseMangaNewUpdate(body),
     );
+  }
+
+  Future<DetailState> fetchDetailPage(String path) async {
+    var body = await fetchBody(path: path);
+
+    if (body != null) {
+      return SuccessDetailState(
+        manga: await parseDetailManga(body),
+      );
+    } else {
+      return FailedDetailState();
+    }
+  }
+
+  Future<ContentState> fetchContentPage(String path) async {
+    var body = await fetchBody(path: path);
+
+    if (body != null) {
+      return SuccessContentState(
+        content: await parseContentManga(body),
+      );
+    } else {
+      return FailedContentState();
+    }
   }
 
   /// === Parser Data === ///
@@ -231,10 +258,13 @@ class NetTruyenRepo extends NetTruyenRepoSource {
     var chapters = <Chapter>[];
     for (var element in chaptersElements ?? <Element>[]) {
       var chapterElement = element.querySelector(".chapter a");
+      var timeUpdateElement =
+          element.querySelector(".col-xs-4.text-center.no-wrap.small");
       chapters.add(
         Chapter(
           url: chapterElement?.attributes["href"]?.trim(),
           name: chapterElement?.text.trim(),
+          timeUpdate: timeUpdateElement?.text.trim(),
         ),
       );
     }
@@ -248,6 +278,31 @@ class NetTruyenRepo extends NetTruyenRepoSource {
           .trim(),
       categories: categories,
       chapters: chapters,
+    );
+  }
+
+  Future<Content?> parseContentManga(String? body) async {
+    var queries = {"page": ".reading-detail .page-chapter img"};
+
+    var pageElements = documentQuery<List<Element>>(
+      document: parse(body),
+      query: queries.getOrNull("page"),
+      isAll: true,
+    );
+
+    var contents = <String>[];
+
+    pageElements?.forEach((element) {
+      var url = trimUrl(element.attributes.getOrNull("data-original"));
+      print("object $url");
+      if (url != null) {
+        contents.add(url);
+      }
+    });
+
+    return Content(
+      contents: contents,
+      referer: baseUrl,
     );
   }
 

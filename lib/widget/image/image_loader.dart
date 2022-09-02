@@ -27,8 +27,6 @@ class MangaImage extends StatelessWidget {
 
   Widget placeholder() {
     return const SizedBox(
-      width: 240,
-      height: 320,
       child: Center(
         child: SizedBox(
           height: 24,
@@ -42,8 +40,6 @@ class MangaImage extends StatelessWidget {
   Widget error() {
     return errorBuilder?.call() ??
         Container(
-          width: 240,
-          height: 320,
           color: Colors.red,
         );
   }
