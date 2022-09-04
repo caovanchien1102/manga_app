@@ -26,7 +26,7 @@ class MDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if(fill == true) {
+    if (fill == true) {
       return const Spacer();
     }
     return Container(

@@ -1,7 +1,7 @@
-extension ListExtension<T> on List<T> {
+extension ListExtension<T> on List<T>? {
   T? getOrNull(int index) {
     try {
-      return this[index];
+      return this?[index];
     } catch (e) {
       return null;
     }
@@ -9,7 +9,7 @@ extension ListExtension<T> on List<T> {
 
   T? firstOrNull() {
     try {
-      return first;
+      return this?.first;
     } catch (e) {
       return null;
     }
@@ -17,9 +17,23 @@ extension ListExtension<T> on List<T> {
 
   T? lastOrNull() {
     try {
-      return last;
+      return this?.last;
     } catch (e) {
       return null;
     }
+  }
+
+  List<TResult> list<TResult>({
+    required TResult Function(T value) process,
+  }) {
+    var children = <TResult>[];
+    try {
+      this?.forEach((element) {
+        children.add(process(element));
+      });
+    } catch (e) {
+      return [];
+    }
+    return children;
   }
 }

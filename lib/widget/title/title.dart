@@ -3,16 +3,18 @@ import 'package:manga_app/widget/divider/divider.dart';
 import 'package:manga_app/widget/text/text.dart';
 
 class MTitle extends StatelessWidget {
-  final String title;
   final double? space;
   final Widget? icon;
+  final String title;
   final TextStyle? titleStyle;
+  final int? maxLines;
 
   const MTitle({
     Key? key,
     this.icon,
-    this.titleStyle,
     this.space,
+    this.titleStyle,
+    this.maxLines,
     required this.title,
   }) : super(key: key);
 
@@ -23,14 +25,18 @@ class MTitle extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (icon != null) ...[
-          icon ?? const SizedBox.shrink(),
-          MDivider(
-            width: space,
+          Padding(
+            padding: EdgeInsets.only(
+              right: space ?? 0,
+            ),
+            child: icon!,
           ),
         ],
         MText(
           text: title,
           style: titleStyle,
+          maxLines: maxLines,
+          overflow: TextOverflow.ellipsis,
         )
       ],
     );

@@ -4,6 +4,8 @@ class Manga {
   String? url;
   String? thumb;
   String? name;
+  String? author;
+  String? status;
   String? description;
 
   String? newChapter;
@@ -23,10 +25,12 @@ class Manga {
     this.categories,
     this.chapters,
     this.referer,
+    this.author,
+    this.status,
   });
 
   @override
   String toString() {
-    return "${categories?.length} $categories";
+    return 'Manga{url: $url, thumb: $thumb, name: $name, author: $author, status: $status, description: $description, newChapter: $newChapter, timeUpdate: $timeUpdate, referer: $referer, categories: $categories, chapters: $chapters}';
   }
 }

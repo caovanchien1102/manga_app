@@ -216,6 +216,8 @@ class NetTruyenRepo extends NetTruyenRepoSource {
       "thumb": "#item-detail .detail-info .col-image img",
       "description": "#item-detail .detail-content p",
       "categories": "#item-detail .detail-info .list-info .kind a",
+      "author": "#item-detail .detail-info .list-info .author",
+      "status": "#item-detail .detail-info .list-info .status",
       "chapters": "#item-detail .list-chapter nav ul li.row",
     };
 
@@ -236,6 +238,14 @@ class NetTruyenRepo extends NetTruyenRepoSource {
     var timeUpdateElement = documentQuery<Element>(
       document: document,
       query: listQuery.getOrNull("timeUpdate"),
+    );
+    var authorElement = documentQuery<Element>(
+      document: document,
+      query: listQuery.getOrNull("author"),
+    );
+    var statusElement = documentQuery<Element>(
+      document: document,
+      query: listQuery.getOrNull("status"),
     );
     var categoriesElements = documentQuery<List<Element>>(
       document: document,
@@ -276,6 +286,8 @@ class NetTruyenRepo extends NetTruyenRepoSource {
       timeUpdate: timeUpdateElement?.text
           .replaceAll(RegExp(r"\[Cập nhật lúc: |\]"), "")
           .trim(),
+      author: authorElement?.text.replaceAll(RegExp("Tác giả"), "").trim(),
+      status: statusElement?.text.replaceAll(RegExp("Tình trạng"), "").trim(),
       categories: categories,
       chapters: chapters,
     );
@@ -294,7 +306,6 @@ class NetTruyenRepo extends NetTruyenRepoSource {
 
     pageElements?.forEach((element) {
       var url = trimUrl(element.attributes.getOrNull("data-original"));
-      print("object $url");
       if (url != null) {
         contents.add(url);
       }

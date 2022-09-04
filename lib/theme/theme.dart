@@ -1,72 +1,14 @@
 import 'package:flutter/material.dart';
-
-const lightColorScheme = ColorScheme(
-  brightness: Brightness.light,
-  primary: Color(0xFF006E17),
-  onPrimary: Color(0xFFFFFFFF),
-  primaryContainer: Color(0xFF72FF72),
-  onPrimaryContainer: Color(0xFF002203),
-  secondary: Color(0xFF006E29),
-  onSecondary: Color(0xFFFFFFFF),
-  secondaryContainer: Color(0xFF79FD8D),
-  onSecondaryContainer: Color(0xFF002107),
-  tertiary: Color(0xFF725C00),
-  onTertiary: Color(0xFFFFFFFF),
-  tertiaryContainer: Color(0xFFFFE080),
-  onTertiaryContainer: Color(0xFF231B00),
-  error: Color(0xFFBA1A1A),
-  errorContainer: Color(0xFFFFDAD6),
-  onError: Color(0xFFFFFFFF),
-  onErrorContainer: Color(0xFF410002),
-  background: Color(0xFFF5FFF5),
-  onBackground: Color(0xFF002111),
-  surface: Color(0xFFF5FFF5),
-  onSurface: Color(0xFF002111),
-  surfaceVariant: Color(0xFFDEE5D8),
-  onSurfaceVariant: Color(0xFF424940),
-  outline: Color(0xFF73796F),
-  onInverseSurface: Color(0xFFC0FFD7),
-  inverseSurface: Color(0xFF003921),
-  inversePrimary: Color(0xFF00E63C),
-  shadow: Color(0xFF000000),
-  surfaceTint: Color(0xFF006E17),
-);
-
-const darkColorScheme = ColorScheme(
-  brightness: Brightness.dark,
-  primary: Color(0xFF00E63C),
-  onPrimary: Color(0xFF003908),
-  primaryContainer: Color(0xFF00530F),
-  onPrimaryContainer: Color(0xFF72FF72),
-  secondary: Color(0xFF5BE074),
-  onSecondary: Color(0xFF003912),
-  secondaryContainer: Color(0xFF00531D),
-  onSecondaryContainer: Color(0xFF79FD8D),
-  tertiary: Color(0xFFEDC20E),
-  onTertiary: Color(0xFF3C2F00),
-  tertiaryContainer: Color(0xFF564500),
-  onTertiaryContainer: Color(0xFFFFE080),
-  error: Color(0xFFFFB4AB),
-  errorContainer: Color(0xFF93000A),
-  onError: Color(0xFF690005),
-  onErrorContainer: Color(0xFFFFDAD6),
-  background: Color(0xFF002111),
-  onBackground: Color(0xFF91F7BD),
-  surface: Color(0xFF002111),
-  onSurface: Color(0xFF91F7BD),
-  surfaceVariant: Color(0xFF424940),
-  onSurfaceVariant: Color(0xFFC2C8BD),
-  outline: Color(0xFF8C9388),
-  onInverseSurface: Color(0xFF002111),
-  inverseSurface: Color(0xFF91F7BD),
-  inversePrimary: Color(0xFF006E17),
-  shadow: Color(0xFF000000),
-  surfaceTint: Color(0xFF00E63C),
-);
+import 'package:manga_app/theme/color_scheme.dart';
 
 class ThemeManga {
   static final lightTheme = ThemeData(
     useMaterial3: true,
     colorScheme: lightColorScheme,
+  );
+
+  static final darkTheme = ThemeData(
+    useMaterial3: true,
+    colorScheme: darkColorScheme,
   );
 }

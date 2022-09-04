@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:manga_app/widget/divider/divider.dart';
+import 'package:manga_app/theme/size.dart';
 
 class MCard extends StatelessWidget {
   final Widget child;
   final Widget? header;
 
   final bool noDivider;
-  final bool noSpacer;
   final bool noPadding;
 
   const MCard({
@@ -14,7 +13,6 @@ class MCard extends StatelessWidget {
     required this.child,
     this.header,
     this.noDivider = false,
-    this.noSpacer = true,
     this.noPadding = false,
   }) : super(key: key);
 
@@ -22,31 +20,28 @@ class MCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.all(
-        noDivider ? 0 : 8,
+        noDivider ? 0 : containerMargin,
+      ).copyWith(bottom: 0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(
+          containerRadius,
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (header != null) ...[
-            Padding(
-              padding: EdgeInsets.all(
-                noPadding ? 0 : 8,
-              ).copyWith(bottom: 0),
-              child: header ?? const SizedBox.shrink(),
-            ),
-            MDivider(
-              height: noSpacer ? 0 : 8,
-            )
-          ],
+          if (header != null) header!,
           Padding(
             padding: EdgeInsets.all(
-              noPadding ? 0 : 8,
+              noPadding ? 0 : containerPadding,
             ),
             child: Container(
               clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(
+                  containerRadius,
+                ),
               ),
               child: child,
             ),

@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:manga_app/base/base_state.dart';
 import 'package:manga_app/model/manga.dart';
+import 'package:manga_app/page/detail/detail_page.dart';
 import 'package:manga_app/page/home/bloc/home_bloc.dart';
 import 'package:manga_app/page/home/bloc/home_event.dart';
 import 'package:manga_app/page/home/bloc/home_state.dart';
 import 'package:manga_app/page/home/widget/home_new_update_item.dart';
 import 'package:manga_app/page/home/widget/home_nomination_item.dart';
-import 'package:manga_app/utils/list.dart';
+import 'package:manga_app/theme/size.dart';
+import 'package:manga_app/theme/text_style.dart';
 import 'package:manga_app/widget/card/card.dart';
 import 'package:manga_app/widget/divider/divider.dart';
-import 'package:manga_app/widget/icon/circle.dart';
+import 'package:manga_app/widget/list/list.dart';
+import 'package:manga_app/widget/text/text.dart';
 import 'package:manga_app/widget/title/title.dart';
 
 class HomePage extends StatefulWidget {
@@ -34,17 +37,46 @@ class _HomePageState extends BaseState<HomeBloc, HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: _buildNomination(),
+      appBar: AppBar(
+        centerTitle: true,
+        title: const MText(
+          text: "Trang chủ",
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      drawer: Drawer(
+        child: _buildDrawerMenu(context),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const MDivider(
+              height: 8,
             ),
-            SliverToBoxAdapter(
-              child: _buildNewUpdate(),
-            )
+            _buildNomination(),
+            _buildNewUpdate(),
+            const MDivider(
+              height: containerMargin,
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerMenu(BuildContext context) {
+    return SafeArea(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          MText(
+            text: 'NetTruyen',
+          )
+        ],
       ),
     );
   }
@@ -60,42 +92,32 @@ class _HomePageState extends BaseState<HomeBloc, HomePage> {
 
         if (state is NominationHomeState) {
           mangas.addAll(state.mangas ?? []);
-        } else {
-          mangas.addAll(<Manga>[]);
         }
 
         return MCard(
-          header: const MTitle(
-            title: "Truyện đề cử",
-            icon: CircleTitleIcon(
-              size: 12,
-              color: Colors.blue,
-            ),
-            space: 4,
-            titleStyle: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
+          header: Padding(
+            padding: const EdgeInsets.all(
+              containerPadding,
+            ).copyWith(bottom: 0),
+            child: MTitle(
+              title: "Truyện đề cử",
+              titleStyle: context.headerSmall,
             ),
           ),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: Row(
-              children: List.generate(mangas.length, (index) {
-                var manga = mangas[index];
-                return Padding(
-                  padding: EdgeInsets.only(
-                    right: index == ((mangas.length) - 1) ? 0 : 8,
-                  ),
-                  child: HomeNominationItem(
-                    url: manga.url ?? "",
-                    imageUrl: manga.thumb ?? "",
-                    name: manga.name ?? "",
-                    newChapter: manga.newChapter,
-                    timeUpdate: manga.timeUpdate,
-                    onTap: (url) {},
-                  ),
+            child: ListGenerate<Manga>(
+              items: mangas,
+              spacing: 8,
+              direction: Axis.horizontal,
+              itemBuilder: (manga) {
+                return HomeNominationItem(
+                  manga: manga,
+                  onTap: (url) {
+                    goToDetailPage(url);
+                  },
                 );
-              }),
+              },
             ),
           ),
         );
@@ -114,40 +136,27 @@ class _HomePageState extends BaseState<HomeBloc, HomePage> {
 
         if (state is NewMangaUpdateHomeState) {
           mangas.addAll(state.mangas ?? []);
-        } else {
-          mangas.addAll(<Manga>[]);
         }
 
         return MCard(
-          header: const MTitle(
-            title: "Truyện mới cập nhật",
-            icon: CircleTitleIcon(
-              size: 12,
-              color: Colors.blue,
-            ),
-            space: 4,
-            titleStyle: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
+          header: Padding(
+            padding: const EdgeInsets.all(
+              containerPadding,
+            ).copyWith(bottom: 0),
+            child: MTitle(
+              title: "Truyện mới cập nhật",
+              titleStyle: context.headerSmall,
             ),
           ),
-          child: ListView.separated(
-            shrinkWrap: true,
-            itemCount: mangas.length,
-            physics: const NeverScrollableScrollPhysics(),
-            separatorBuilder: (_, index) {
-              return const MDivider(
-                height: 8,
-              );
-            },
-            itemBuilder: (_, index) {
-              var manga = mangas.getOrNull(index);
-
+          child: ListGenerate<Manga?>(
+            items: mangas,
+            spacing: 16,
+            itemBuilder: (manga) {
               return HomeNewUpdateItem(
                 manga: manga,
                 onTap: (url) {
                   Navigator.of(context).pushNamed(
-                    "detail_page",
+                    DetailPage.route,
                     arguments: url,
                   );
                 },
@@ -156,6 +165,15 @@ class _HomePageState extends BaseState<HomeBloc, HomePage> {
           ),
         );
       },
+    );
+  }
+
+  /// === === ///
+
+  void goToDetailPage(String? path) {
+    Navigator.of(context).pushNamed(
+      DetailPage.route,
+      arguments: path,
     );
   }
 }

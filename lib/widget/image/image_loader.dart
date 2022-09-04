@@ -47,10 +47,10 @@ class MangaImage extends StatelessWidget {
 
 class MangaImageProvider extends CachedNetworkImageProvider {
   MangaImageProvider({
-    required String imageUrl,
+    required String? imageUrl,
     String? referer,
   }) : super(
-          imageUrl,
+          imageUrl ?? "",
           headers: {
             "Referer": referer ?? "",
           },

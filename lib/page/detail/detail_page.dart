@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:manga_app/base/base_state.dart';
+import 'package:manga_app/contant/tag_colors.dart';
 import 'package:manga_app/model/chapter.dart';
+import 'package:manga_app/model/manga.dart';
 import 'package:manga_app/page/content/content_page.dart';
 import 'package:manga_app/page/detail/bloc/detail_bloc.dart';
 import 'package:manga_app/page/detail/bloc/detail_event.dart';
 import 'package:manga_app/page/detail/bloc/detail_state.dart';
+import 'package:manga_app/theme/color_scheme.dart';
+import 'package:manga_app/theme/size.dart';
+import 'package:manga_app/theme/text_style.dart';
+import 'package:manga_app/theme/theme_extension.dart';
 import 'package:manga_app/utils/list.dart';
 import 'package:manga_app/widget/card/card.dart';
 import 'package:manga_app/widget/divider/divider.dart';
-import 'package:manga_app/widget/icon/circle.dart';
 import 'package:manga_app/widget/image/image_loader.dart';
+import 'package:manga_app/widget/tag/tag.dart';
 import 'package:manga_app/widget/text/text.dart';
 import 'package:manga_app/widget/title/title.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 const _minChapterShow = 10;
 
@@ -44,72 +51,137 @@ class _DetailPageState extends BaseState<DetailBloc, DetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: MText(
+          text: "Chi tiết truyện",
+          style: context.headerMedium,
+        ),
+      ),
       body: SafeArea(
         child: BlocBuilder(
-            bloc: bloc,
-            builder: (context, state) {
-              if (state is SuccessDetailState) {
-                var manga = state.manga;
-                return SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      MCard(
-                        header: const MTitle(
-                          title: "Thong tin",
-                          icon: CircleTitleIcon(
-                            size: 12,
-                            color: Colors.blue,
-                          ),
-                          space: 4,
-                          titleStyle: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            FractionallySizedBox(
-                              widthFactor: 0.6,
-                              child: Container(
-                                clipBehavior: Clip.hardEdge,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8)),
-                                child: MangaImage(
-                                  imageUrl: manga?.thumb ?? "",
-                                ),
-                              ),
-                            ),
-                            const MDivider(
-                              height: 16,
-                            ),
-                            MText(
-                              text: manga?.name,
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            _item(
-                              title: "Thể loại:",
-                              categories: manga?.categories,
-                            ),
-                            _item(
-                              content: "NỘI DUNG: ${manga?.description}",
-                            )
-                          ],
-                        ),
-                      ),
-                      _chaptersBuilder(manga?.chapters),
-                    ],
+          bloc: bloc,
+          builder: (context, state) {
+            if (state is SuccessDetailState) {
+              var manga = state.manga;
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _detailBuilder(manga),
+                    _descriptionBuilder(manga?.description),
+                    _chaptersBuilder(manga?.chapters),
+                    const MDivider(
+                      height: containerMargin,
+                    ),
+                  ],
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _detailBuilder(Manga? manga) {
+    return MCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          FractionallySizedBox(
+            widthFactor: 0.65,
+            child: Container(
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(
+                  containerRadius,
+                ),
+              ),
+              child: MangaImage(
+                imageUrl: manga?.thumb ?? "",
+              ),
+            ),
+          ),
+          const MDivider(height: 16),
+          MText(
+            text: manga?.name,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: context.headerMedium?.copyWith(
+              height: 1.05,
+            ),
+          ),
+          const MDivider(height: 8),
+          _itemDetail(
+            title: "Tác giả:",
+            useTag: false,
+            contents: [
+              manga?.author ?? "",
+            ],
+          ),
+          _itemDetail(
+            title: "Tình trạng:",
+            useTag: false,
+            contents: [
+              manga?.status ?? "",
+            ],
+          ),
+          const MDivider(height: 2),
+          _itemDetail(
+            title: "Thể loại:",
+            contents: manga?.categories ?? [],
+          ),
+          const MDivider(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {},
+                  child: MText(
+                    text: "Đọc từ đầu",
+                    style: context.bodyMedium,
                   ),
-                );
-              }
-              return const SizedBox.shrink();
-            }),
+                ),
+              ),
+              const MDivider(width: 8),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {},
+                  child: MText(
+                    text: "Đọc mới nhất",
+                    style: context.bodyMedium,
+                  ),
+                ),
+              )
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _descriptionBuilder(String? description) {
+    if (description == null) {
+      return const SizedBox.shrink();
+    }
+
+    return MCard(
+      header: Padding(
+        padding: const EdgeInsets.all(
+          containerPadding,
+        ).copyWith(bottom: 0),
+        child: MTitle(
+          title: "Nội dung",
+          titleStyle: context.headerSmall,
+        ),
+      ),
+      child: MText(
+        text: description,
+        style: context.bodyMedium,
       ),
     );
   }
@@ -117,88 +189,72 @@ class _DetailPageState extends BaseState<DetailBloc, DetailPage> {
   Widget _chaptersBuilder(List<Chapter>? chapters) {
     ValueNotifier<bool> chaptersNotifier = ValueNotifier(_isReadMoreChapter);
 
+    int length() {
+      if (_isReadMoreChapter) {
+        return chapters?.length ?? 0;
+      } else {
+        return (chapters?.length ?? 0) < _minChapterShow
+            ? (chapters?.length ?? 0)
+            : _minChapterShow;
+      }
+    }
+
     if (chapters != null) {
       return MCard(
-        header: const MTitle(
-          title: "Chapters",
-          icon: CircleTitleIcon(
-            size: 12,
-            color: Colors.blue,
-          ),
-          space: 4,
-          titleStyle: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
+        header: Padding(
+          padding: const EdgeInsets.all(
+            containerPadding,
+          ).copyWith(bottom: 0),
+          child: MTitle(
+            title: "Danh sách chương",
+            titleStyle: context.headerSmall,
           ),
         ),
         child: ValueListenableBuilder(
           valueListenable: chaptersNotifier,
           builder: (context, value, child) {
-            return ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _isReadMoreChapter ? chapters.length : _minChapterShow,
-              separatorBuilder: (context, index) {
-                return const MDivider(
-                  height: 1,
-                  top: 8,
-                  bottom: 8,
-                  color: Colors.grey,
-                );
-              },
-              itemBuilder: (context, index) {
-                if (!_isReadMoreChapter && _minChapterShow - 1 == index) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      _isReadMoreChapter = !_isReadMoreChapter;
-                      chaptersNotifier.value = _isReadMoreChapter;
+            return Column(
+              children: [
+                for (int index = 0; index < length(); index++) ...[
+                  if (index != 0)
+                    MDivider(
+                      height: 1,
+                      top: itemSpace / 2,
+                      bottom: itemSpace / 2,
+                      color: context.themeData?.dividerColor,
+                    ),
+                  GestureDetector(
+                    onTap: () {
+                      print("Tap Tap");
                     },
-                    child: const Text("Xem them"),
-                  );
-                }
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).popAndPushNamed(
-                      ContentPage.route,
-                      arguments: chapters.getOrNull(index)?.url,
-                    );
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                          containerRadius,
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(
+                        itemPadding,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Icon(
-                            Icons.numbers_outlined,
-                            size: 12,
+                          MTitle(
+                            title: chapters.getOrNull(index)?.name ?? "",
+                            maxLines: 1,
+                            titleStyle: context.bodyMedium,
                           ),
-                          const MDivider(
-                            width: 4,
+                          MTitle(
+                            title: chapters.getOrNull(index)?.timeUpdate ?? "",
+                            maxLines: 1,
+                            titleStyle: context.bodySmall,
                           ),
-                          MText(
-                            text: chapters.getOrNull(index)?.name ?? "",
-                          )
                         ],
                       ),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.timer_outlined,
-                            size: 12,
-                          ),
-                          const MDivider(
-                            width: 4,
-                          ),
-                          MText(
-                            text: chapters.getOrNull(index)?.timeUpdate ?? "",
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
+                    ),
+                  )
+                ]
+              ],
             );
           },
         ),
@@ -208,78 +264,51 @@ class _DetailPageState extends BaseState<DetailBloc, DetailPage> {
     return const SizedBox.shrink();
   }
 
-  Widget _item({
-    List<String>? categories,
-    String? title,
-    String? content,
+  Widget _itemDetail({
+    required List<String> contents,
+    required String? title,
+    bool useTag = true,
   }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(
-            top: categories != null ? 4 : 0,
-          ),
-          child: MText(
-            text: title,
-          ),
-        ),
-        Expanded(
-          child: categories != null
-              ? Wrap(
-                  children: [
-                    for (var category in categories)
-                      _itemHeader(
-                        context: context,
-                        content: category,
-                        color: Colors.blue,
-                      ),
-                  ],
-                )
-              : MText(
-                  text: content,
-                ),
-        ),
-      ],
-    );
-  }
-
-  Widget _itemHeader({
-    required BuildContext context,
-    required String? content,
-    required Color color,
-    Widget? icon,
-  }) {
-    if (content == null) {
-      return const SizedBox.shrink();
-    }
-
-    return Container(
-      margin: const EdgeInsets.only(top: 4, left: 4),
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.6),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+    if (useTag) {
+      return Wrap(
+        spacing: 4,
+        runSpacing: 4,
         children: [
-          if (icon != null) ...[
-            icon,
-            const MDivider(
-              width: 2,
-            ),
-          ],
           MText(
-            text: content,
-            style: const TextStyle(
-              fontSize: 8.5,
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
+            text: title,
+            style: context.titleMedium,
+          ),
+          for (var content in contents)
+            MTag(
+              background: tagColor(),
+              radius: containerRadius,
+              padding: const EdgeInsets.symmetric(
+                vertical: 2,
+                horizontal: 4,
+              ),
+              content: MText(
+                text: content,
+                style: context.bodySmall.white,
+              ),
             ),
-          )
         ],
-      ),
-    );
+      );
+    } else {
+      return Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: "$title ",
+              style: context.titleMedium,
+            ),
+            for (var content in contents)
+              TextSpan(
+                text: content,
+                style: context.bodyMedium,
+              )
+          ],
+        ),
+      );
+    }
   }
 }
